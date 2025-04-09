@@ -7,6 +7,7 @@ import org.example.bootthymeleaf.model.repository.WordRepository;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -56,6 +57,13 @@ public class MainController {
         Word word = new Word();
         word.setText(wordForm.getWord());
         wordRepository.save(word);
+        return "redirect:/";
+    }
+
+    @PostMapping("/delete")
+    public String deleteWord(@RequestParam("id") String uuid, RedirectAttributes redirectAttributes) {
+        wordRepository.deleteById(uuid);
+        redirectAttributes.addFlashAttribute("message", "정상적으로 삭제되었습니다.%s".formatted(uuid));
         return "redirect:/";
     }
 
