@@ -22,8 +22,18 @@
         <ul>
 <!--            <li th:each="word : ${words}" th:text="${word}"></li>-->
             <li th:each="word : ${words}">
+
                 <span th:text="${word.getText()}"></span>
                 <span th:text="${word.getCreatedAt()}"></span>
+                <form th:action="@{/update}" method="post">
+                    <input hidden="hidden" th:name="uuid" th:value="${word.getUuid()}" />
+                    <label>
+                        수정 :
+                        <input type="text"  th:field="newWord">
+                    </label>
+                    <button>수정</button>
+                </form>
+
                 <form th:action="@{/delete}" method="post">
                     <input hidden="hidden" name="id" th:value="${word.getUuid()}"/>
                     <button>삭제</button>

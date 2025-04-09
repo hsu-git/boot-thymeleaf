@@ -1,6 +1,8 @@
 package org.example.bootthymeleaf.controller;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.example.bootthymeleaf.model.dto.UpdateWordForm;
 import org.example.bootthymeleaf.model.dto.WordForm;
 import org.example.bootthymeleaf.model.entity.Word;
 import org.example.bootthymeleaf.model.repository.WordRepository;
@@ -47,7 +49,7 @@ public class MainController {
 //        model.addAttribute("message", message);
 //        model.addAttribute("data", "Hello World!");
         // 타임리프에서 이미 폼을 이미 정의된 걸로 쓰려면 Model을 통해 전달해야함.
-        model.addAttribute("wordForm", new WordForm());
+        model.addAttribute("wordForm", new WordForm()); // 주입함
         return "index"; // forward
     }
 
@@ -57,6 +59,26 @@ public class MainController {
         Word word = new Word();
         word.setText(wordForm.getWord());
         wordRepository.save(word);
+        return "redirect:/";
+    }
+
+    @PostMapping("/update")
+    public String updateWord(@ModelAttribute UpdateWordForm form, RedirectAttributes redirectAttributes) {
+        // JPA는 업데이트용 메서드나 기능이 따로 없음
+        // JPA는 수정용이 따로 없음
+        // -> 교체 개념 => put <-> patch : 멱등성 (TIL)
+        // JPA : Jakarta Persistence API
+//        Word word = new Word();
+//        word.setText(form.getNewWord());
+//        word.setUuid(form.getUuid());
+        // -> 어? 너 이미 있는 애와 같은 이름으로 저장하려고 하는거지?
+        Word oldWord = wordRepository.findById(form.getUuid()).orElseThrow();
+        // 없으면 에러처리하겠다 -> null로 인한 이슈를 깔끔하게 에러로 해버리겠다.
+        oldWord.setText(form.getNewWord());
+        wordRepository.save(oldWord);
+        // 너.. 원래 있던 애를 불러서 바꿔서 저장하는구나! OK!!
+        redirectAttributes.addFlashAttribute(
+                "message", "정상적으로 교체되었습니다. %s".formatted(oldWord.getUuid()));
         return "redirect:/";
     }
 
