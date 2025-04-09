@@ -1,6 +1,7 @@
 package org.example.bootthymeleaf.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.example.bootthymeleaf.model.dto.WordForm;
 import org.example.bootthymeleaf.model.entity.Word;
 import org.example.bootthymeleaf.model.repository.WordRepository;
 import org.springframework.stereotype.Controller;
@@ -23,7 +24,18 @@ public class MainController {
         model.addAttribute("words", wordRepository.findAll());
 //        model.addAttribute("message", message);
 //        model.addAttribute("data", "Hello World!");
+        // 타임리프에서 이미 폼을 이미 정의된 걸로 쓰려면 Model을 통해 전달해야함.
+        model.addAttribute("wordForm", new WordForm());
         return "index"; // forward
+    }
+
+    @PostMapping("/word")
+    public String addWord(WordForm wordForm, RedirectAttributes redirectAttributes) {
+        redirectAttributes.addFlashAttribute("message", "끝말잇기 추가");
+        Word word = new Word();
+        word.setText(wordForm.getWord());
+        wordRepository.save(word);
+        return "redirect:/";
     }
 
     @PostMapping("/reset")
